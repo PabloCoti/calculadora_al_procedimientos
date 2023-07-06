@@ -75,9 +75,9 @@ class MainView(QMainWindow):
             self.comboBox_matrix_a_op.hide()
 
 
-        else:
-            self.frame_encryption.hide()
-            self.label_e_message.setText('Mensaje')
+        # else:
+        #     self.frame_encryption.hide()
+        #     self.label_e_message.setText('Mensaje')
 
     def calculate_matrix_result(self):
         a = utils.matrix_convertion(self.textEdit_ma.toPlainText())

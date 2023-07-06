@@ -1,4 +1,5 @@
 from fractions import Fraction as FR
+from .matrix import *
 import re
 
 
@@ -222,31 +223,50 @@ def gj_solve_equation(coefficients, constants, letters):
 
 
 def sarrus_solve_equation(coefficients, constants, letters):
-    if len(coefficients) != 3 or len(coefficients[0]) != 3 or len(constants) != 3:
-        raise ValueError("Invalid input: The coefficients and constants should have dimensions 3x3 and 3x1, respectively.")
+    procedure = ''
 
-    matrix = coefficients + [coefficients[0]]  # Create a 3x4 matrix by repeating the first row
+    # Calculate the identity's matrix determinant
+    identity_det = matrix_determinant(coefficients)
+    procedure += f"Se calcula la determinante de la matriz identidad\n{identity_det}"
 
-    # Calculate the main diagonal products
-    main_diag_products = [matrix[i][j] * matrix[i+1][j+1] * matrix[i+2][j+2] for i, j in enumerate(range(3))]
-    main_diag_sum = sum(main_diag_products)
-
-    # Calculate the secondary diagonal products
-    sec_diag_products = [matrix[i][j+2] * matrix[i+1][j+1] * matrix[i+2][j] for i, j in enumerate(range(3))]
-    sec_diag_sum = sum(sec_diag_products)
-
-    # Calculate the determinant
-    determinant = main_diag_sum - sec_diag_sum
-
-    # Calculate the variables
-    variable_values = []
-    for i in range(3):
-        submatrix = coefficients.copy()
-        submatrix[i] = constants.copy()
-        variable_value = sarrus_solve_equation(submatrix, constants, letters)
-        variable_values.append(variable_value)
-
-    result = ', '.join([f"{letters[i]} = {variable_values[i]}" for i in range(3)])
-    return result, determinant
+    identity_det = identity_det.split('=')
+    identity_det = int(identity_det[1])
 
 
+    # if the determinant is not 0 that means that the system is solvable
+    if identity_det != 0 and len(coefficients[0]) == 3:
+        results = []
+
+        for i in range(3):
+            new_coefficients = coefficients.copy()
+
+            for x in range(len(constants)):
+                new_coefficients[x][i] = constants[x]
+
+            procedure += f"\nSustituir los valores de las constantes en la matriz identidad: \n"
+            for row in new_coefficients:
+                for n in row:
+                    procedure += f"{n} "
+                procedure += '\n'
+
+            procedure += f"\nCalcular la determinante de la nueva matriz\n"
+
+            det = matrix_determinant(new_coefficients)
+            procedure += det
+
+            det = int(det.split('=')[1])
+
+            procedure += f"\n\nDividir determinante dentro de determinante de identidad: \n"
+            results.append(FR(det/identity_det).limit_denominator())
+            procedure += str(FR(det/identity_det).limit_denominator())
+
+        result = ''
+        for n, l in enumerate(letters):
+            result += f"{l}={results[n]}"
+
+        procedure += f"\n{result}"
+
+        return procedure
+
+    else:
+        return 'Error'

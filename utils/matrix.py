@@ -1,4 +1,5 @@
 from fractions import Fraction as FR
+import numpy as np
 
 
 abc = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
@@ -330,13 +331,16 @@ def message_to_matrix(message):
 def encrypt_matrix(message, key):
     m_message = message_to_matrix(message)
     m_key = matrix_convertion(key)
+    m_key = np.array(m_key)
 
     print(m_message)
 
-    if matrix_determinant(m_key) == 0:
+    if np.linalg.det(m_key) == 0:
         return 'Error'
 
-    m_encrypted = matrix_mult(m_key, m_message)
+    m_message = np.array(m_message)
+
+    m_encrypted = np.matmul(m_key, m_message)
 
     print(matrix_traspose(m_encrypted))
 
